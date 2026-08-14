@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+
+int main()
+{
+    pid_t pid1, pid2, pid3, zombie_pid;
+
+    printf("Parent Process: PID = %d\n", getpid());
+
+    // Create 3 child processes
+    pid1 = fork();
+
+    if (pid1 == 0)
+    {
+        printf("Child 1: PID = %d\n", getpid());
+        sleep(2);
+        printf("Child 1 finished\n");
+        exit(0);
+    }
+
+    pid2 = fork();
+
+    if (pid2 == 0)
+    {
+        printf("Child 2: PID = %d\n", getpid());
+        sleep(4);
+        printf("Child 2 finished\n");
+        exit(0);
+    }
+
+    pid3 = fork();
+
+    if (pid3 == 0)
+    {
+        printf("Child 3: PID = %d\n", getpid());
+        sleep(6);
+        printf("Child 3 finished\n");
+        exit(0);
+    }
+
+    // Demonstrate wait()
+    printf("\nParent using wait()...\n");
+    wait(NULL);
+    printf("One child completed using wait()\n");
+
+    // Demonstrate waitpid()
+    printf("\nParent using waitpid()...\n");
+    waitpid(pid2, NULL, 0);
+    printf("Child 2 completed using waitpid()\n");
+
+    waitpid(pid3, NULL, 0);
+    printf("Child 3 completed using waitpid()\n");
+
+    // Create a zombie process
+    zombie_pid = fork();
+
+    if (zombie_pid == 0)
+    {
+        printf("\nZombie child: PID = %d\n", getpid());
+        exit(0);
+    }
+    else
+    {
+        printf("Zombie child created. PID = %d\n", zombie_pid);
+        printf("Parent will wait for 10 seconds.\n");
+        printf("Check the process table using another terminal.\n");
+
+        sleep(10);
+
+        // Remove zombie using wait()
+        waitpid(zombie_pid, NULL, 0);
+
+        printf("Zombie process eliminated using waitpid().\n");
+    }
+
+    return 0;
+}
