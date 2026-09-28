@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <string.h>
+
+void parse_input(char *input) {
+    int escaped = 0;
+
+    printf("Parsed output: ");
+
+    for (int i = 0; input[i] != '\0'; i++) {
+
+        if (escaped) {
+            printf("%c", input[i]);
+            escaped = 0;
+        }
+        else if (input[i] == '\\') {
+            escaped = 1;
+        }
+        else {
+            printf("%c", input[i]);
+        }
+    }
+
+    if (escaped)
+        printf("\nWarning: Unfinished escape sequence");
+
+    printf("\n");
+}
+
+int main() {
+    char input[200];
+
+    printf("Enter a command/string: ");
+    fgets(input, sizeof(input), stdin);
+
+    input[strcspn(input, "\n")] = '\0';
+
+    printf("\nOriginal input: %s\n", input);
+
+    parse_input(input);
+
+    return 0;
+}
